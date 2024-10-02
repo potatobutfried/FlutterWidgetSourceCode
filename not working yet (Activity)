@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+//Jeremy C. Sabino IT-301
+class Product{
+  const Product({required this.name});
+  final String name;
+}
+
+
+typedef CartChangeCallback = Function (Product product, bool inCart);
+
+class ShoppingListItem extends StatelessWidget {
+  ShoppingListItem({
+    required this.product,
+    required this.inCart,
+    required this.onCartChange,
+  }) : super(key: ObjectKey(product));
+
+  final Product product;
+  final bool inCart;
+  final CartChangeCallback onCartChange;
+
+ @override
+  Widget build(BuildContext context){
+   
+   return ListTile(
+    onTap: (){
+      onCartChange(product, inCart);
+    },
+    leading: CircleAvatar(
+      backgroundColor: _getColor(context),
+      child: Text(product.name[0])
+    ),
+    title: Text(
+      product.name,
+      style: _getTextStyle(context),
+    ),
+   );
+  } 
+}
+
+
+class ShoppingList extends StatefulWidget{
+  const ShoppingList ({required this.product, super.key});
+  final List<Product> product;
+
+  State<ShoppingList> createState()=> _ShoppingListState()
+}
+
+class _ShoppingListState extends State<ShoppingList>{
+  final _shoppingcart = <Product>{};
+
+  void _handleCartChange(Product product, bool inCart){
+    setState(() {
+          if (inCart){
+            _shoppingcart.add(product);
+          } else {
+            _shoppingcart.remove(product);
+          }
+        });
+  }
+
+  @override
+  Widget build(BuildContext context){
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ShoppingList'),
+      ),
+      body: ListView(
+        padding const EdgeInsets.symmetric(vertical: 8),
+        children: widget.product.map((product){
+          return ShoppingListItem(
+            product: product,
+            inCart: _shoppingcart.contains(product),
+            onCartChange: _handleCartChange,
+          );
+        }), 
+        ),
+      );
+    }
+
+    
+  }
